@@ -420,6 +420,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         moveCamera(originMarker, destinationMarker);
         navigating = true;
         populate((RouteInfo) values[1]);
+        Parse
         ParseGeoPoint originGeopoint = new ParseGeoPoint(origin.getLatLng().latitude, origin.getLatLng().longitude);
         ParseGeoPoint destGeopoint = new ParseGeoPoint(destination.getLatLng().latitude, destination.getLatLng().longitude);
         user.put("origin", originGeopoint);
