@@ -237,7 +237,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
                 switch (item.getItemId()) {
                     case R.id.nav_home:
                         Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
