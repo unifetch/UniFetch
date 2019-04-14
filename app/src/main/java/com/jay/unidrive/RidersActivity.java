@@ -172,7 +172,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
                 new LatLng(3.218896, 101.751801)));
         autocompleteFragmentOrigin.setCountry("MY");
 
-
         // Origin Place Listener
         autocompleteFragmentOrigin.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -238,7 +237,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
                 switch (item.getItemId()) {
                     case R.id.nav_home:
                         Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
@@ -305,7 +304,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         ParseGeoPoint currentLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         user.put("location", currentLocation);
         user.saveInBackground();
-
     }
 
     public void moveCameraWhenPressed(View view) {
