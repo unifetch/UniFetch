@@ -1,0 +1,19 @@
+<resources>
+
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+
+    <!-- Change the following strings as required -->
+    <string name="back4app_app_id">LAfw0yA85rXyWdlhprNDbI7NbENYqTb18l7ye8kG</string>
+    <string name="back4app_client_key">qHtkxkIGkdNf4EGowhVTRIOR3tdDbT2dxJZli1nH</string>
+
+    <string name="app_name">UniDrive</string>
+    <string name="title_activity_riders">Map</string>
+
+    <string name="place_details">&lt;b&gt;%1$s&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Place Id: %2$s&lt;/i&gt;&lt;br/&gt;Address: %3$s&lt;br/&gt;Phone: %4$s&lt;br/&gt;Website: %5$s</string>
+    <string name="google_place_api_key"> AIzaSyA-0uMRWJ50H6kfZtzcvFu87CzhHmfHZec</string>
+
+    <string name="openDrawer">Open Drawer </string>
+    <string name="closeDrawer">Close Drawer </string>
+    <string name="title_activity_driver">UniDrive</string>
+
+</resources>
