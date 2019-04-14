@@ -207,6 +207,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
+
                 destination = place;
             }
 
@@ -308,7 +309,17 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
     }
 
     public void moveCameraWhenPressed(View view) {
-        getLocation();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        updateMap(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
     }
 
     private void moveCamera(Marker marker1, Marker marker2){
@@ -345,8 +356,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             if (lastKnownLocation != null){
 
                 updateMap(lastKnownLocation);
-            } else {
-                updateMap(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
             }
         }
         return lastKnownLocation;
@@ -444,6 +453,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         } else {
             Toast.makeText(this, "Please select origin and destination", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     public void switchActivity(View view){
