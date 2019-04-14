@@ -6,7 +6,11 @@ buildscript {
         google()
     }
     dependencies {
+<<<<<<< HEAD
         classpath 'com.android.tools.build:gradle:3.3.2'
+=======
+        classpath 'com.android.tools.build:gradle:3.2.0'
+>>>>>>> 555e39e6b116b7846cd064efa50a0c203983d7e1
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

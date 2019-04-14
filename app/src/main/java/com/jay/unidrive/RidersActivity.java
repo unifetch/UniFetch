@@ -207,7 +207,10 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 555e39e6b116b7846cd064efa50a0c203983d7e1
                 destination = place;
             }
 
@@ -238,7 +241,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
                 switch (item.getItemId()) {
                     case R.id.nav_home:
                         Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
@@ -305,6 +308,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         ParseGeoPoint currentLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         user.put("location", currentLocation);
         user.saveInBackground();
+<<<<<<< HEAD
 
     }
 
@@ -320,6 +324,12 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             return;
         }
         updateMap(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+=======
+    }
+
+    public void moveCameraWhenPressed(View view) {
+        getLocation();
+>>>>>>> 555e39e6b116b7846cd064efa50a0c203983d7e1
     }
 
     private void moveCamera(Marker marker1, Marker marker2){
@@ -356,6 +366,11 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             if (lastKnownLocation != null){
 
                 updateMap(lastKnownLocation);
+<<<<<<< HEAD
+=======
+            } else {
+                updateMap(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
+>>>>>>> 555e39e6b116b7846cd064efa50a0c203983d7e1
             }
         }
         return lastKnownLocation;
@@ -453,7 +468,10 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         } else {
             Toast.makeText(this, "Please select origin and destination", Toast.LENGTH_SHORT).show();
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 555e39e6b116b7846cd064efa50a0c203983d7e1
     }
 
     public void switchActivity(View view){
