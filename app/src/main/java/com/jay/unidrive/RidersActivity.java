@@ -304,6 +304,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         ParseGeoPoint currentLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         user.put("location", currentLocation);
         user.saveInBackground();
+
     }
 
     public void moveCameraWhenPressed(View view) {
