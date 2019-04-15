@@ -148,7 +148,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         };
         getLocation();
-
     }
 
     private void initializeSearchBar() {
@@ -255,7 +254,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
                 return true;
             }
         });
-
         navigationView.getMenu().getItem(0).setChecked(true);
     }
 
@@ -296,9 +294,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
         if (locationMarker != null) locationMarker.remove();
         locationMarker = addMarker(new MarkerOptions().position(userLocation).title("Your Location").icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmap(R.drawable.human_icon))));
-        if (!navigating) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 18));
-        }
         currentLocation = userLocation;
 
         ParseGeoPoint currentLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
@@ -306,36 +301,33 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         user.saveInBackground();
     }
 
-    public void moveCameraWhenPressed(View view) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+    private void recenterCamera(){
+        if (lastKnownLocation != null) {
+            LatLng userLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 18));
         }
-        updateMap(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+    }
+
+    public void moveCameraWhenPressed(View view) {
+        getLocation();
     }
 
     private void moveCamera(Marker marker1, Marker marker2){
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-//the include method will calculate the min and max bound.
-        builder.include(marker1.getPosition());
-        builder.include(marker2.getPosition());
+            //the include method will calculate the min and max bound.
+            builder.include(marker1.getPosition());
+            builder.include(marker2.getPosition());
 
-        LatLngBounds bounds = builder.build();
+            LatLngBounds bounds = builder.build();
 
-        int width = getResources().getDisplayMetrics().widthPixels;
-        int height = getResources().getDisplayMetrics().heightPixels - 300;
-        int padding = (int) (width * 0.15); // offset from edges of the map 15% of screen
+            int width = getResources().getDisplayMetrics().widthPixels;
+            int height = getResources().getDisplayMetrics().heightPixels - 300;
+            int padding = (int) (width * 0.15); // offset from edges of the map 15% of screen
 
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
 
-        mMap.animateCamera(cu);
+            mMap.animateCamera(cu);
     }
 
     public final Marker addMarker (MarkerOptions options) {
@@ -343,19 +335,21 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private Location getLocation() {
-        Location lastKnownLocation = null;
+        lastKnownLocation = null;
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 350 , 250, locationListener);
-
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 150, 150, locationListener);
             lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (lastKnownLocation == null){
+                lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
             if (lastKnownLocation != null){
-
                 updateMap(lastKnownLocation);
             }
         }
+        recenterCamera();
         return lastKnownLocation;
     }
 
@@ -375,6 +369,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
                     if (lastKnownLocation != null) {
 
                         updateMap(lastKnownLocation);
+                        getLocation();
                     }
                 }
 
@@ -420,7 +415,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         moveCamera(originMarker, destinationMarker);
         navigating = true;
         populate((RouteInfo) values[1]);
-        Parse
         ParseGeoPoint originGeopoint = new ParseGeoPoint(origin.getLatLng().latitude, origin.getLatLng().longitude);
         ParseGeoPoint destGeopoint = new ParseGeoPoint(destination.getLatLng().latitude, destination.getLatLng().longitude);
         user.put("origin", originGeopoint);
