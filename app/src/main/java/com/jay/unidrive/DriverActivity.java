@@ -10,15 +10,20 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 
 public class DriverActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -37,6 +43,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
     private LocationListener locationListener;
     private Location lastKnownLocation;
     private Marker locationMarker;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +56,8 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        navigationView = findViewById(R.id.nv);
+
         setupMenu();
     }
 
@@ -58,6 +68,30 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
+        drawerLayout = findViewById(R.id.drawer_layout);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                //Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
+                switch (item.getItemId()) {
+                    case R.id.nav_home:
+                        Toast.makeText(DriverActivity.this, "Camera", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_settings:
+                        Toast.makeText(DriverActivity.this, "Gallery", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_logout:
+                        ParseUser.logOut();
+                        finish();
+                        break;
+                    default:
+                        return true;
+                }
+                return true;
+            }
+        });
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     @Override
@@ -94,6 +128,18 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         finish();
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     private Location getLocation() {
         lastKnownLocation = null;
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
@@ -123,7 +169,6 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     getLocation();
                 }
-
             }
         }
     }
@@ -148,5 +193,10 @@ public class DriverActivity extends AppCompatActivity implements OnMapReadyCallb
         Bitmap b = bitmapdraw.getBitmap();
         Bitmap smallMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
         return smallMarker;
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
     }
 }

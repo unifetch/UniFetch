@@ -9,18 +9,6 @@
     tools:openDrawer="end">
 
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nv"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/quantum_lightblueA400"
-        android:visibility="visible"
-        app:menu="@menu/drawer_view"
-        app:headerLayout="@layout/nav_header">
-
-    </android.support.design.widget.NavigationView>
-
     <RelativeLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/mapLayout"
@@ -78,4 +66,16 @@
             android:textStyle="bold" />
 
     </RelativeLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nv"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/quantum_lightblueA400"
+        android:visibility="visible"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_view">
+
+    </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

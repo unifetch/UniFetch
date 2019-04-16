@@ -62,7 +62,8 @@
             android:theme="@style/UniDriveTheme" />
         <activity
             android:name=".DriverActivity"
-            android:label="@string/title_activity_driver"></activity>
+            android:label="@string/title_activity_driver" />
+        <activity android:name=".SettingActivity"></activity>
     </application>
 
 </manifest>

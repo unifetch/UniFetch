@@ -60,6 +60,7 @@ import com.jay.unidrive.model.Direction.FetchUrl;
 import com.jay.unidrive.model.Direction.TaskLoadedCallback;
 import com.jay.unidrive.model.RouteInfo;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.Arrays;
@@ -340,7 +341,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 150, 150, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50, 50, locationListener);
             lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (lastKnownLocation == null){
                 lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -362,7 +363,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 150, 150, locationListener);
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50, 50, locationListener);
 
                     lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -415,16 +416,18 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         moveCamera(originMarker, destinationMarker);
         navigating = true;
         populate((RouteInfo) values[1]);
-        ParseGeoPoint originGeopoint = new ParseGeoPoint(origin.getLatLng().latitude, origin.getLatLng().longitude);
-        ParseGeoPoint destGeopoint = new ParseGeoPoint(destination.getLatLng().latitude, destination.getLatLng().longitude);
-        user.put("origin", originGeopoint);
-        user.put("destination", destGeopoint);
+        String originString = origin.getLatLng().latitude + "," + origin.getLatLng().longitude;
+        String destinationString = destination.getLatLng().latitude + "," + destination.getLatLng().longitude;
+        user.put("origin", originString);
+        user.put("destination", destinationString);
         user.saveInBackground();
        }
 
     @Override
     public void onBackPressed() {
-        if (navigating){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else if (navigating){
             currentPolyline.remove();
             originMarker.remove();
             destinationMarker.remove();
