@@ -53,6 +53,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.maps.android.SphericalUtil;
@@ -68,6 +69,8 @@ import java.util.Objects;
 
 
 public class RidersActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, TaskLoadedCallback {
+
+    int AUTOCOMPLETE_REQUEST_CODE = 1;
 
     private static final String TAG = "RidersActivity";
     private GoogleMap mMap;
@@ -148,6 +151,12 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
         };
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Toast.makeText(RidersActivity.this, latLng.latitude +","+latLng.longitude, Toast.LENGTH_SHORT).show();
+            }
+        });
         getLocation();
     }
 
@@ -166,18 +175,11 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
                 new LatLng(3.218896, 101.751801)));
         autocompleteFragmentOrigin.setCountry("MY");
 
-        autocompleteFragmentOrigin.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
-        autocompleteFragmentOrigin.setLocationBias(RectangularBounds.newInstance(
-                new LatLng(3.215299, 101.748198),
-                new LatLng(3.218896, 101.751801)));
-        autocompleteFragmentOrigin.setCountry("MY");
-
         // Origin Place Listener
         autocompleteFragmentOrigin.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
-                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
                 origin = place;
             }
 
@@ -208,6 +210,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
                 // TODO: Get info about the selected place.
 
                 destination = place;
+
             }
 
             @Override
@@ -243,7 +246,8 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
                         Toast.makeText(RidersActivity.this, "Camera", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.nav_settings:
-                        Toast.makeText(RidersActivity.this, "Gallery", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(RidersActivity.this, SettingActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.nav_logout:
                         ParseUser.logOut();
@@ -424,6 +428,11 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
        }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -434,6 +443,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             navigating = false;
             container.removeAllViews();
             fetchButton.setVisibility(View.VISIBLE);
+            fetchButton.setTop(R.id.place_autocomplete_fragment_dest);
         } else {
             finishAffinity();
         }
@@ -450,6 +460,11 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             Toast.makeText(this, "Please select origin and destination", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public void searchLocation(View view){
+        Intent intent = new Intent(RidersActivity.this, SearchActivity.class);
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
     }
 
     public void switchActivity(View view){

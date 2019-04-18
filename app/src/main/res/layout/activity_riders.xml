@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    tools:openDrawer="end">
 
 
     <RelativeLayout
@@ -27,53 +27,7 @@
                 tools:context="com.jay.unidrive.RidersActivity"
                 android:layout_alignParentLeft="true" />
 
-            <LinearLayout
-                android:id="@+id/searchbarLayoutOrigin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/toolbar"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/white_border"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp">
 
-                <fragment
-                    android:id="@+id/place_autocomplete_fragment_origin"
-                    android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/searchbarLayoutDest"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/searchbarLayoutOrigin"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:background="@drawable/white_border"
-                android:layout_marginTop="5dp"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp">
-
-                <fragment
-                    android:id="@+id/place_autocomplete_fragment_dest"
-                    android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    />
-            </LinearLayout>
 
             <Button
                 android:id="@+id/fetchButton"
@@ -122,19 +76,19 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <ImageView
-                android:id="@+id/getLocationButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/searchbarLayoutDest"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="19dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:clickable="true"
-                android:onClick="moveCameraWhenPressed"
-                android:src="@drawable/ic_my_location_white_24dp" />
+        <ImageView
+            android:id="@+id/getLocationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/fetchButton"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="33dp"
+            android:layout_marginRight="33dp"
+            android:layout_marginBottom="29dp"
+            android:clickable="true"
+            android:onClick="moveCameraWhenPressed"
+            app:srcCompat="@drawable/ic_my_location_white_24dp" />
 
             <ImageView
                 android:id="@+id/switchImageView"
@@ -147,7 +101,7 @@
                 android:layout_marginEnd="14dp"
                 android:layout_marginRight="10dp"
                 android:onClick="switchActivity"
-                android:src="@drawable/ic_loop_white_24dp" />
+                app:srcCompat="@drawable/ic_loop_white_24dp" />
 
             <TextView
                 android:id="@+id/toolbar_title"
@@ -165,7 +119,53 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-        </RelativeLayout>
+        <LinearLayout
+            android:id="@+id/searchbarLayoutOrigin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
+            android:background="@drawable/rounded_corners"
+            android:orientation="vertical">
+
+            <fragment
+                android:id="@+id/place_autocomplete_fragment_origin"
+                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/searchbarLayoutDest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/searchbarLayoutOrigin"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/rounded_corners"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchbarLayoutOrigin">
+
+            <fragment
+                android:id="@+id/place_autocomplete_fragment_dest"
+                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nv"
