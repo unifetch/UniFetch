@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -64,7 +66,10 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -93,6 +98,12 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle toggle;
+    private LinearLayout searchBarOrigin;
+    private LinearLayout searchBarDest;
+    private Button chooseConfirmButton;
+    private LatLng originLatlng;
+    private AutocompleteSupportFragment autocompleteFragmentOrigin;
+    private String address;
 
     Polyline currentPolyline;
     LatLng currentLocation;
@@ -106,6 +117,9 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
         drawerLayout = findViewById(R.id.drawer_layout);
         fetchButton = findViewById(R.id.fetchButton);
+        searchBarDest = findViewById(R.id.searchbarLayoutDest);
+        searchBarOrigin = findViewById(R.id.searchbarLayoutOrigin);
+        chooseConfirmButton = findViewById(R.id.chooseConfirmButton);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -151,12 +165,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
         };
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                Toast.makeText(RidersActivity.this, latLng.latitude +","+latLng.longitude, Toast.LENGTH_SHORT).show();
-            }
-        });
         getLocation();
     }
 
@@ -165,7 +173,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         Places.initialize(getApplicationContext(), "AIzaSyA9QNjBgd0mIabGWyboE_ZrTPfNdn1RJi4");
 
         // Origin Search Bar
-        AutocompleteSupportFragment autocompleteFragmentOrigin = (AutocompleteSupportFragment)
+        autocompleteFragmentOrigin = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.place_autocomplete_fragment_origin);
 
         // Specify the types of place data to return.
@@ -459,7 +467,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         } else {
             Toast.makeText(this, "Please select origin and destination", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     public void searchLocation(View view){
@@ -481,6 +488,48 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         distanceTextView.setText(routeInfo.getDistance()/1000 + " km");
         destinationNameTextView.setText("to : " + destination.getName());
         originNameTextView.setText("from : " + origin.getName());
+    }
+
+    public void chooseFromMap(View view){
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (originMarker!= null) originMarker.remove();
+                originLatlng = latLng;
+
+
+                Geocoder geocoder;
+                List<Address> addresses = null;
+                geocoder = new Geocoder(RidersActivity.this, Locale.getDefault());
+                address = "Unknown Location";
+
+                try {
+                    addresses = geocoder.getFromLocation(originLatlng.latitude, originLatlng.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                    address = addresses.get(0).getAddressLine(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                originMarker = addMarker(new MarkerOptions().position(Objects.requireNonNull(latLng))
+                        .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmap(R.drawable.map_marker))));
+
+            }
+        });
+        fetchButton.setVisibility(View.INVISIBLE);
+        searchBarOrigin.setVisibility(View.INVISIBLE);
+        searchBarDest.setVisibility(View.INVISIBLE);
+        chooseConfirmButton.setVisibility(View.VISIBLE);
+    }
+
+    public void finishChoosing(View view) throws IOException {
+        searchBarOrigin.setVisibility(View.VISIBLE);
+        fetchButton.setVisibility(View.VISIBLE);
+        searchBarDest.setVisibility(View.VISIBLE);
+        chooseConfirmButton.setVisibility(View.INVISIBLE);
+        mMap.setOnMapClickListener(null);
+
+
+        Toast.makeText(RidersActivity.this, address, Toast.LENGTH_SHORT).show();
+        autocompleteFragmentOrigin.setText(address);
     }
 
     //    private ResultCallback<PlaceBuffer> updatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {

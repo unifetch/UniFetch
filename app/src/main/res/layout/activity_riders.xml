@@ -165,6 +165,29 @@
 
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/searchbarLayoutDest"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="11dp"
+            android:layout_marginRight="11dp"
+            android:onClick="chooseFromMap"
+            app:srcCompat="@drawable/ic_map_black_24dp" />
+
+        <Button
+            android:id="@+id/chooseConfirmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/fetchButton"
+            android:layout_centerHorizontal="true"
+            android:onClick="finishChoosing"
+            android:visibility="invisible"
+            android:text="Comfirm" />
+
     </RelativeLayout>
 
     <android.support.design.widget.NavigationView
