@@ -59,15 +59,21 @@
         <activity
             android:name=".RidersActivity"
             android:label="@string/title_activity_riders"
-            android:theme="@style/UniDriveTheme" />
+            android:theme="@style/UniDriveTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".DriverActivity"
-            android:label="@string/title_activity_driver" />
+            android:label="@string/title_activity_driver"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".SettingActivity"
             android:label="Settings"
             android:parentActivityName=".RidersActivity"
-            android:theme="@style/SettingsTheme" />
+            android:theme="@style/SettingsTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"/>
         <activity android:name=".SearchActivity"></activity>
     </application>
 

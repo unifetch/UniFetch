@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.LayoutTransition;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -23,6 +24,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -62,6 +64,7 @@ import com.google.maps.android.SphericalUtil;
 import com.jay.unidrive.model.Direction.FetchUrl;
 import com.jay.unidrive.model.Direction.TaskLoadedCallback;
 import com.jay.unidrive.model.RouteInfo;
+import com.jay.unidrive.model.UniLocation;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -73,7 +76,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 
-public class RidersActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, TaskLoadedCallback {
+public class RidersActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, TaskLoadedCallback{
 
     int AUTOCOMPLETE_REQUEST_CODE = 1;
 
@@ -84,8 +87,8 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
     private Location lastKnownLocation;
     private Marker locationMarker;
     private Marker originMarker;
-    private Place destination;
-    private Place origin;
+    private UniLocation destination;
+    private UniLocation origin;
     private Marker destinationMarker;
     private ParseUser user;
     private boolean navigating = false;
@@ -93,17 +96,21 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
     private TextView distanceTextView;
     private TextView destinationNameTextView;
     private TextView originNameTextView;
-    private String destinationName;
     private Button fetchButton;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private LatLng chosenLatLng;
     private ActionBarDrawerToggle toggle;
     private LinearLayout searchBarOrigin;
     private LinearLayout searchBarDest;
     private Button chooseConfirmButton;
-    private LatLng originLatlng;
     private AutocompleteSupportFragment autocompleteFragmentOrigin;
+    private AutocompleteSupportFragment autocompleteFragmentDest;
     private String address;
+    private String mode;
+    private ImageView getLocationImageView;
+    private ImageView chooseOriginImageView;
+    private ImageView chooseDestImageView;
 
     Polyline currentPolyline;
     LatLng currentLocation;
@@ -115,11 +122,15 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_riders);
 
+        //Initialize
         drawerLayout = findViewById(R.id.drawer_layout);
         fetchButton = findViewById(R.id.fetchButton);
         searchBarDest = findViewById(R.id.searchbarLayoutDest);
         searchBarOrigin = findViewById(R.id.searchbarLayoutOrigin);
         chooseConfirmButton = findViewById(R.id.chooseConfirmButton);
+        getLocationImageView = findViewById(R.id.getLocationButton);
+        chooseDestImageView = findViewById(R.id.chooseDestImageView);
+        chooseOriginImageView = findViewById(R.id.chooseOriginImageView);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -142,7 +153,20 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
+        //Custom Marker Clicker
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+
+        //default camera view
+        LatLng tarucLatLng = new LatLng(3.216514, 101.728918);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tarucLatLng, 13));
+
+        //location listener
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -171,6 +195,8 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
     private void initializeSearchBar() {
         // Initialize Places.
         Places.initialize(getApplicationContext(), "AIzaSyA9QNjBgd0mIabGWyboE_ZrTPfNdn1RJi4");
+        origin = new UniLocation();
+        destination = new UniLocation();
 
         // Origin Search Bar
         autocompleteFragmentOrigin = (AutocompleteSupportFragment)
@@ -188,7 +214,8 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
-                origin = place;
+                origin.setName(place.getName());
+                origin.setLatLng(place.getLatLng());
             }
 
             @Override
@@ -200,7 +227,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
 
         //Destination Search Bar
-        AutocompleteSupportFragment autocompleteFragmentDest = (AutocompleteSupportFragment)
+        autocompleteFragmentDest = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.place_autocomplete_fragment_dest);
 
         // Specify the types of place data to return.
@@ -211,14 +238,14 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         autocompleteFragmentDest.setCountry("MY");
 
 
-// Set up a PlaceSelectionListener to handle the response.
+        // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragmentDest.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
                 // TODO: Get info about the selected place.
 
-                destination = place;
-
+                destination.setName(place.getName());
+                destination.setLatLng(place.getLatLng());
             }
 
             @Override
@@ -229,6 +256,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
+    //Setup navigation Menu Button
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -241,10 +269,8 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
     private void setupMenu() {
         navigationView = findViewById(R.id.nv);
-//        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.openDrawer, R.string.closeDrawer);
-//        drawerLayout.addDrawerListener(toggle);
-//        toggle.syncState();
 
+        //When navigation item selected
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -270,12 +296,14 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         navigationView.getMenu().getItem(0).setChecked(true);
     }
 
+    //Setup transition for navigation details popup
     private void setupTransition() {
         container = findViewById(R.id.container);
         LayoutTransition transition = new LayoutTransition();
         container.setLayoutTransition(transition);
     }
 
+    //Shows navigation details in a popup
     public void expandDetails(View view) {
         LayoutInflater layoutInflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View addView = layoutInflater.inflate(R.layout.navigating_details_layout, null);
@@ -294,6 +322,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         });
     }
 
+    //convert id to Bitmap
     private Bitmap getMarkerBitmap(int id) {
 
         BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(id);
@@ -302,6 +331,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         return smallMarker;
     }
 
+    //Updates Map when user location changes
     private void updateMap(Location location) {
         LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -314,6 +344,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         user.saveInBackground();
     }
 
+    //Recenters camera based on lastKnownLocation
     private void recenterCamera(){
         if (lastKnownLocation != null) {
             LatLng userLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
@@ -325,6 +356,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         getLocation();
     }
 
+    //Move camera when passed in 2 markers
     private void moveCamera(Marker marker1, Marker marker2){
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
@@ -336,7 +368,7 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
             int width = getResources().getDisplayMetrics().widthPixels;
             int height = getResources().getDisplayMetrics().heightPixels - 300;
-            int padding = (int) (width * 0.15); // offset from edges of the map 15% of screen
+            int padding = (int) (height * 0.27); // offset from edges of the map 15% of screen
 
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
 
@@ -353,10 +385,10 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 50, 50, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 50, locationListener);
             lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (lastKnownLocation == null){
-                lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                buildAlertMessageNoGps();
             }
             if (lastKnownLocation != null){
                 updateMap(lastKnownLocation);
@@ -364,6 +396,24 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         }
         recenterCamera();
         return lastKnownLocation;
+    }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Please enable Location Service to continue.")
+                .setCancelable(false)
+                .setPositiveButton("Go To Settings", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override
@@ -381,7 +431,6 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
                     if (lastKnownLocation != null) {
 
-                        updateMap(lastKnownLocation);
                         getLocation();
                     }
                 }
@@ -400,9 +449,9 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
     }
 
-    private String getUrl(LatLng origin, Place dest, String directionMode){
+    private String getUrl(LatLng origin, LatLng dest, String directionMode){
         String str_origin = "origin=" +origin.latitude + "," + origin.longitude;
-        String str_dest = "destination=" + dest.getLatLng().latitude + "," + dest.getLatLng().longitude;
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         String mode = "mode=" + directionMode;
         String parameter = str_origin + "&" + str_dest + "&" + mode;
         String output = "json";
@@ -433,6 +482,12 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
         user.put("origin", originString);
         user.put("destination", destinationString);
         user.saveInBackground();
+        searchBarOrigin.setVisibility(View.INVISIBLE);
+        searchBarDest.setVisibility(View.INVISIBLE);
+        getLocationImageView.setVisibility(View.INVISIBLE);
+
+        chooseDestImageView.setVisibility(View.INVISIBLE);
+        chooseOriginImageView.setVisibility(View.INVISIBLE);
        }
 
     @Override
@@ -450,20 +505,32 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
             destinationMarker.remove();
             navigating = false;
             container.removeAllViews();
-            fetchButton.setVisibility(View.VISIBLE);
-            fetchButton.setTop(R.id.place_autocomplete_fragment_dest);
+            exitNavigation();
         } else {
             finishAffinity();
         }
     }
 
+    private void exitNavigation (){
+        getLocationImageView.setVisibility(View.VISIBLE);
+        searchBarDest.setVisibility(View.VISIBLE);
+        searchBarOrigin.setVisibility(View.VISIBLE);
+        chooseDestImageView.setVisibility(View.VISIBLE);
+        chooseOriginImageView.setVisibility(View.VISIBLE);
+        fetchButton.setVisibility(View.VISIBLE);
+    }
+
+    private void enterNavigation(){
+    }
+
     public void fetch(View view){
-        if (origin != null && destination != null) {
-            Log.i(TAG, "Place: " + destination.getName() + ", " + destination.getId());
-            String url = getUrl(Objects.requireNonNull(origin.getLatLng()), destination, "driving");
-            Log.i(TAG, "Place direction: " + url);
-            expandDetails(view);
-            new FetchUrl(RidersActivity.this).execute(url, "driving");
+        if (origin.getLatLng() != null && destination.getLatLng() != null) {
+            if (lastKnownLocation != null) {
+                String url = getUrl(Objects.requireNonNull(origin.getLatLng()), destination.getLatLng(), "driving");
+                Log.i(TAG, "Place direction: " + url);
+                expandDetails(view);
+                new FetchUrl(RidersActivity.this).execute(url, "driving");
+            }
         } else {
             Toast.makeText(this, "Please select origin and destination", Toast.LENGTH_SHORT).show();
         }
@@ -486,50 +553,72 @@ public class RidersActivity extends AppCompatActivity implements OnMapReadyCallb
 
     private void populate(RouteInfo routeInfo){
         distanceTextView.setText(routeInfo.getDistance()/1000 + " km");
-        destinationNameTextView.setText("to : " + destination.getName());
-        originNameTextView.setText("from : " + origin.getName());
+        destinationNameTextView.setText("To : " + destination.getName());
+        originNameTextView.setText("From : " + origin.getName());
     }
 
     public void chooseFromMap(View view){
+        mode = view.getTag().toString();
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (originMarker!= null) originMarker.remove();
-                originLatlng = latLng;
+                if (mode.equals("origin")) {
+                    if (originMarker != null) originMarker.remove();
 
+                    chosenLatLng = latLng;
+                    originMarker = addMarker(new MarkerOptions().position(Objects.requireNonNull(latLng))
+                            .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmap(R.drawable.map_marker))));
+                } else if (mode.equals("destination")){
+                    if (destinationMarker != null) destinationMarker.remove();
 
-                Geocoder geocoder;
-                List<Address> addresses = null;
-                geocoder = new Geocoder(RidersActivity.this, Locale.getDefault());
-                address = "Unknown Location";
-
-                try {
-                    addresses = geocoder.getFromLocation(originLatlng.latitude, originLatlng.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-                    address = addresses.get(0).getAddressLine(0);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    chosenLatLng = latLng;
+                    destinationMarker = addMarker(new MarkerOptions().position(Objects.requireNonNull(latLng)));
                 }
-                originMarker = addMarker(new MarkerOptions().position(Objects.requireNonNull(latLng))
-                        .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmap(R.drawable.map_marker))));
-
             }
         });
         fetchButton.setVisibility(View.INVISIBLE);
         searchBarOrigin.setVisibility(View.INVISIBLE);
         searchBarDest.setVisibility(View.INVISIBLE);
         chooseConfirmButton.setVisibility(View.VISIBLE);
+        chooseOriginImageView.setVisibility(View.INVISIBLE);
+        chooseDestImageView.setVisibility(View.INVISIBLE);
+        getLocationImageView.setVisibility(View.INVISIBLE);
     }
 
+
+
     public void finishChoosing(View view) throws IOException {
-        searchBarOrigin.setVisibility(View.VISIBLE);
-        fetchButton.setVisibility(View.VISIBLE);
-        searchBarDest.setVisibility(View.VISIBLE);
+        exitNavigation();
         chooseConfirmButton.setVisibility(View.INVISIBLE);
         mMap.setOnMapClickListener(null);
 
 
-        Toast.makeText(RidersActivity.this, address, Toast.LENGTH_SHORT).show();
-        autocompleteFragmentOrigin.setText(address);
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        geocoder = new Geocoder(RidersActivity.this, Locale.getDefault());
+        address = "Unknown Location";
+
+        try {
+            addresses = geocoder.getFromLocation(chosenLatLng.latitude, chosenLatLng.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            address = addresses.get(0).getAddressLine(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        switch (mode) {
+            case "origin":
+                origin.setLatLng(chosenLatLng);
+                origin.setName(address);
+                autocompleteFragmentOrigin.setText(origin.getName());
+                originMarker.setTitle(origin.getName());
+                break;
+            case "destination":
+                destination.setName(address);
+                destination.setLatLng(chosenLatLng);
+                autocompleteFragmentDest.setText(destination.getName());
+                destinationMarker.setTitle(destination.getName());
+                break;
+        }
     }
 
     //    private ResultCallback<PlaceBuffer> updatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {

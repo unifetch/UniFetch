@@ -9,115 +9,113 @@
     tools:openDrawer="end">
 
 
-    <RelativeLayout
+    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/mapLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/mapLayout"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:map="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                tools:context="com.jay.unidrive.RidersActivity"
-                android:layout_alignParentLeft="true" />
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            tools:context="com.jay.unidrive.RidersActivity" />
 
 
+        <Button
+            android:id="@+id/fetchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="23dp"
+            android:layout_marginRight="23dp"
+            android:layout_marginBottom="15dp"
+            android:onClick="fetch"
+            android:text="Fetch" />
 
-            <Button
-                android:id="@+id/fetchButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginEnd="23dp"
-                android:layout_marginRight="23dp"
-                android:layout_marginBottom="15dp"
-                android:onClick="fetch"
-                android:text="Fetch" />
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:orientation="vertical">
+        </LinearLayout>
 
-            </LinearLayout>
+        <!--<ImageView-->
+        <!--android:id="@+id/imageView"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginStart="14dp"-->
+        <!--android:layout_marginLeft="14dp"-->
+        <!--android:layout_marginTop="15dp"-->
+        <!--android:clickable="true"-->
+        <!--android:onClick="openDrawer"-->
+        <!--android:src="@drawable/ic_menu_white_24dp"-->
+        <!--android:visibility="gone" />-->
 
-            <!--<ImageView-->
-                <!--android:id="@+id/imageView"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentStart="true"-->
-                <!--android:layout_alignParentLeft="true"-->
-                <!--android:layout_alignParentTop="true"-->
-                <!--android:layout_marginStart="14dp"-->
-                <!--android:layout_marginLeft="14dp"-->
-                <!--android:layout_marginTop="15dp"-->
-                <!--android:clickable="true"-->
-                <!--android:onClick="openDrawer"-->
-                <!--android:src="@drawable/ic_menu_white_24dp"-->
-                <!--android:visibility="gone" />-->
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:title="UniDrive">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:title="UniDrive">
-
-            </android.support.v7.widget.Toolbar>
+        </android.support.v7.widget.Toolbar>
 
         <ImageView
             android:id="@+id/getLocationButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/fetchButton"
+            android:layout_below="@+id/searchbarLayoutDest"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginEnd="33dp"
-            android:layout_marginRight="33dp"
-            android:layout_marginBottom="29dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="35dp"
+            android:layout_marginRight="35dp"
             android:clickable="true"
             android:onClick="moveCameraWhenPressed"
             app:srcCompat="@drawable/ic_my_location_white_24dp" />
 
-            <ImageView
-                android:id="@+id/switchImageView"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="14dp"
-                android:layout_marginRight="10dp"
-                android:onClick="switchActivity"
-                app:srcCompat="@drawable/ic_loop_white_24dp" />
+        <ImageView
+            android:id="@+id/switchImageView"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginRight="10dp"
+            android:onClick="switchActivity"
+            app:srcCompat="@drawable/ic_loop_white_24dp" />
 
-            <TextView
-                android:id="@+id/toolbar_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/switchImageView"
-                android:layout_alignBottom="@+id/switchImageView"
-                android:layout_marginTop="3dp"
-                android:layout_marginRight="2dp"
-                android:layout_marginBottom="8dp"
-                android:layout_toLeftOf="@+id/switchImageView"
-                android:fontFamily="serif"
-                android:text="Rider"
-                android:textColor="@android:color/background_light"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/switchImageView"
+            android:layout_alignBottom="@+id/switchImageView"
+            android:layout_marginTop="3dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="8dp"
+            android:layout_toLeftOf="@+id/switchImageView"
+            android:fontFamily="serif"
+            android:text="Rider"
+            android:textColor="@android:color/background_light"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/searchbarLayoutOrigin"
@@ -142,16 +140,32 @@
                 android:layout_gravity="start" />
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/chooseOriginImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/searchbarLayoutOrigin"
+            android:layout_alignBottom="@+id/searchbarLayoutOrigin"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="40dp"
+            android:onClick="chooseFromMap"
+            android:tag="origin"
+            app:srcCompat="@drawable/ic_map_black_24dp"
+            android:layout_marginEnd="40dp" />
+
+
         <LinearLayout
             android:id="@+id/searchbarLayoutDest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/searchbarLayoutOrigin"
+            android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:background="@drawable/rounded_corners"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/searchbarLayoutOrigin">
@@ -160,23 +174,23 @@
                 android:id="@+id/place_autocomplete_fragment_dest"
                 android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/chooseDestImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/searchbarLayoutDest"
+            android:layout_alignTop="@+id/searchbarLayoutDest"
+            android:layout_alignBottom="@+id/searchbarLayoutDest"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="11dp"
-            android:layout_marginRight="11dp"
+            android:layout_marginRight="40dp"
             android:onClick="chooseFromMap"
-            app:srcCompat="@drawable/ic_map_black_24dp" />
+            android:tag="destination"
+            app:srcCompat="@drawable/ic_map_black_24dp"
+            android:layout_marginEnd="40dp" />
 
         <Button
             android:id="@+id/chooseConfirmButton"
@@ -185,8 +199,8 @@
             android:layout_alignTop="@+id/fetchButton"
             android:layout_centerHorizontal="true"
             android:onClick="finishChoosing"
-            android:visibility="invisible"
-            android:text="Comfirm" />
+            android:text="Comfirm"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 
@@ -202,6 +216,4 @@
         app:menu="@menu/drawer_view">
 
     </android.support.design.widget.NavigationView>
-
-
 </android.support.v4.widget.DrawerLayout>
